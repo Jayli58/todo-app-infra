@@ -9,4 +9,6 @@ export const feConfig = {
     callbackUrls: [
         `https://${sharedConfig.domain}/callback/`,
     ],
+    // GitHub repo for OIDC trust in frontend stack (owner/repo)
+    githubOidcRepo: "Jayli58/todo-app-frontend",
 }

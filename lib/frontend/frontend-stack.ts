@@ -7,6 +7,7 @@ import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
 import * as path from "path";
 import * as acm from "aws-cdk-lib/aws-certificatemanager";
 import * as ssm from "aws-cdk-lib/aws-ssm";
+import * as iam from "aws-cdk-lib/aws-iam";
 import { feConfig } from "../../config/frontend/config.fe";
 
 
@@ -69,8 +70,61 @@ export class FrontendStack extends cdk.Stack {
             distributionPaths: ['/*']
         });
 
+        // github oidc for github actions to deploy frontend
+        const githubOidcProvider = new iam.OpenIdConnectProvider(this, "GitHubOidcProvider", {
+            url: "https://token.actions.githubusercontent.com",
+            clientIds: ["sts.amazonaws.com"],
+        });
+
+        const githubDeployRole = new iam.Role(this, "GitHubFrontendDeployRole", {
+            description: "GitHub Actions role for frontend deploy",
+            assumedBy: new iam.FederatedPrincipal(
+                githubOidcProvider.openIdConnectProviderArn,
+                {
+                    "StringEquals": {
+                        "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
+                    },
+                    "StringLike": {
+                        "token.actions.githubusercontent.com:sub": `repo:${feConfig.githubOidcRepo}:ref:refs/heads/main`,
+                        // checked official doc on https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws
+                        // confirmed the underneath is not necessary and would cause error on assuming oidc role
+                        // "token.actions.githubusercontent.com:workflow_ref": `${feConfig.githubOidcRepo}/.github/workflows/deploy.yml@refs/heads/main`,
+                    },
+                },
+                "sts:AssumeRoleWithWebIdentity",
+            ),
+        });
+
+        githubDeployRole.addToPolicy(new iam.PolicyStatement({
+            actions: [
+                "s3:PutObject",
+                "s3:DeleteObject",
+                "s3:ListBucket",
+            ],
+            resources: [bucket.bucketArn, `${bucket.bucketArn}/*`],
+        }));
+
+        githubDeployRole.addToPolicy(new iam.PolicyStatement({
+            actions: ["cloudfront:CreateInvalidation"],
+            resources: [
+                `arn:aws:cloudfront::${cdk.Stack.of(this).account}:distribution/${cfDistro.distributionId}`,
+            ],
+        }));
+
         new cdk.CfnOutput(this, 'CloudFrontUrl', {
             value: `https://${cfDistro.domainName}`,
+        });
+
+        new cdk.CfnOutput(this, "FrontendBucketName", {
+            value: bucket.bucketName,
+        });
+
+        new cdk.CfnOutput(this, "FrontendDistributionId", {
+            value: cfDistro.distributionId,
+        });
+
+        new cdk.CfnOutput(this, "FrontendGithubDeployRoleArn", {
+            value: githubDeployRole.roleArn,
         });
     }
 }
