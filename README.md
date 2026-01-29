@@ -1,14 +1,19 @@
-# Welcome to your CDK TypeScript project
+# Todo App Infra (AWS CDK)
 
-This is a blank project for CDK development with TypeScript.
+Infrastructure for the Todo App using AWS CDK (TypeScript). It provisions backend and frontend stacks, including API, DynamoDB tables, Cognito auth, and supporting SSM parameters.
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+## Stacks
 
-## Useful commands
+- Backend API stack
+- DynamoDB tables for todos and reminders
+- Cognito user pool and app client
+- Frontend distribution and certificate support
 
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `npx cdk deploy`  deploy this stack to your default AWS account/region
-* `npx cdk diff`    compare deployed stack with current state
-* `npx cdk synth`   emits the synthesized CloudFormation template
+## Common commands
+
+- `npm run build` compile TypeScript
+- `npm run watch` watch and compile
+- `npm run test` run Jest tests
+- `npx cdk deploy` deploy stacks
+- `npx cdk diff` compare deployed vs local
+- `npx cdk synth` synthesize CloudFormation
