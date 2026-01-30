@@ -60,10 +60,10 @@ export class FrontendStack extends cdk.Stack {
             },
         });
 
-        // deploy next static codes onto s3 bucket
+        // deploy next static codes onto s3 bucket (local-only)
+        // ci does not use this; ci is in github actions
         new s3deploy.BucketDeployment(this, 'DeployWebsite', {
-            // todo: integrate with s3 artifact from CI
-            sources: [s3deploy.Source.asset('C:/Users/Lee58/PhpstormProjects/todo-list/my-app/out')],
+            sources: [s3deploy.Source.asset(feConfig.localAssetPath)],
             destinationBucket: bucket,
             distribution: cfDistro,
             // to invalidate cloudfront cache

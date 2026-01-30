@@ -9,6 +9,11 @@ Infrastructure for the Todo App using AWS CDK (TypeScript). It provisions backen
 - Cognito user pool and app client
 - Frontend distribution and certificate support
 
+## CI/CD
+
+- Frontend CI runs in GitHub Actions: build artifact, clear S3, upload artifact to S3, then invalidate CloudFront cache.
+- Backend CI is handled by `lib/ci/backend-pipeline-stack.ts`: an AWS CodePipeline watches an S3 bucket for artifacts built by GitHub Actions. When the S3 content is overwritten, the pipeline triggers and deploys `TodoApiStack` and `ReminderStack`.
+
 ## Common commands
 
 - `npm run build` compile TypeScript

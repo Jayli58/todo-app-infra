@@ -11,4 +11,6 @@ export const feConfig = {
     ],
     // GitHub repo for OIDC trust in frontend stack (owner/repo)
     githubOidcRepo: "Jayli58/todo-app-frontend",
+    // Local-only path for CDK asset deployment
+    localAssetPath: "C:/Users/Lee58/PhpstormProjects/todo-list/my-app/out",
 }
