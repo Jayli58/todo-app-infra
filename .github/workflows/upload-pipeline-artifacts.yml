@@ -22,7 +22,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Create infra zip
-        run: zip -r "$INFRA_OBJECT_KEY" . -x "node_modules/**" "cdk.out/**" ".git/**"
+        run: zip -r "${{ vars.PIPELINE_INFRA_KEY }}" . -x "node_modules/**" "cdk.out/**" ".git/**"
 
       - name: Upload infra zip
-        run: aws s3 cp "$INFRA_OBJECT_KEY" "s3://${{ vars.PIPELINE_SOURCE_BUCKET }}/${{ vars.PIPELINE_INFRA_KEY }}"
+        run: aws s3 cp "${{ vars.PIPELINE_INFRA_KEY }}" "s3://${{ vars.PIPELINE_SOURCE_BUCKET }}/${{ vars.PIPELINE_INFRA_KEY }}"
