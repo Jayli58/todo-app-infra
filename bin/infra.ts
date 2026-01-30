@@ -2,6 +2,7 @@
 import * as cdk from 'aws-cdk-lib/core';
 import {InfraStack} from "../lib/index";
 import {FrontendCertStack} from "../lib/frontend/frontend-cert-stack";
+import {BackendPipelineStack} from "../lib/ci/backend-pipeline-stack";
 
 const app = new cdk.App();
 
@@ -14,5 +15,9 @@ new FrontendCertStack(app, "TodoFrontendCertStack", {
 });
 
 new InfraStack(app, 'InfraStack', {
+  env: { account: account, region: region },
+});
+
+new BackendPipelineStack(app, 'BackendPipelineStack', {
   env: { account: account, region: region },
 });

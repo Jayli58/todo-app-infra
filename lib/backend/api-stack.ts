@@ -27,6 +27,7 @@ export class ApiStack extends cdk.Stack {
         const cognitoRegion = ssm.StringParameter.valueForStringParameter(this, `${apiConfig.Ssm__BasePath}/cognito/region`);
 
         // lambda
+        const myAppRoot = process.env.MYAPP_ROOT ?? '../MyApp';
         const apiFn = new lambda.Function(this, 'TodoApiFn', {
             runtime: lambda.Runtime.DOTNET_8,
             handler: apiConfig.Handler__Name,
@@ -36,7 +37,7 @@ export class ApiStack extends cdk.Stack {
 
             // todo: integrate with CI later
             code: lambda.Code.fromAsset(
-                path.join(process.cwd(), '../MyApp/MyApp/bin/lambda-publish')
+                path.resolve(process.cwd(), myAppRoot, 'MyApp/bin/lambda-publish')
             ),
 
             environment: {

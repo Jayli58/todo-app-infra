@@ -17,6 +17,8 @@ export class ReminderStack extends cdk.Stack {
             description: "Reminder Lambda for TodoApp"
         });
 
+        const myAppRoot = process.env.MYAPP_ROOT ?? '../MyApp';
+
         const fn = new lambda.Function(this, 'ReminderFn', {
             runtime: lambda.Runtime.DOTNET_8,
 
@@ -27,7 +29,7 @@ export class ReminderStack extends cdk.Stack {
             timeout: cdk.Duration.seconds(30),
 
             code: lambda.Code.fromAsset(
-                path.join(process.cwd(), '../MyApp/RemainderLambda/bin/lambda-publish')
+                path.resolve(process.cwd(), myAppRoot, 'RemainderLambda/bin/lambda-publish')
             ),
 
             environment: {
