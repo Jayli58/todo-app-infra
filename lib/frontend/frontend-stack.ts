@@ -85,7 +85,11 @@ export class FrontendStack extends cdk.Stack {
                         "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
                     },
                     "StringLike": {
-                        "token.actions.githubusercontent.com:sub": `repo:${feConfig.githubOidcRepo}:ref:refs/heads/main`,
+                        "token.actions.githubusercontent.com:sub": [
+                            `repo:${feConfig.githubOidcRepo}:ref:refs/heads/main`,
+                            // for github actions workflow (approval)
+                            `repo:${feConfig.githubOidcRepo}:environment:production`
+                        ],
                         // checked official doc on https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws
                         // confirmed the underneath is not necessary and would cause error on assuming oidc role
                         // "token.actions.githubusercontent.com:workflow_ref": `${feConfig.githubOidcRepo}/.github/workflows/deploy.yml@refs/heads/main`,
