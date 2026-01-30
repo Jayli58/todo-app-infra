@@ -53,7 +53,7 @@ export class BackendPipelineStack extends cdk.Stack {
                     build: {
                         commands: [
                             'cd "$infra_dir"',
-                            'npx cdk deploy TodoApiStack ReminderStack --require-approval never',
+                            'npx cdk deploy TodoApiStack ReminderStack --require-approval never -c skipFrontend=true',
                         ],
                     },
                 },

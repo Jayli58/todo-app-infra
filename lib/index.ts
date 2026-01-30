@@ -18,6 +18,10 @@ export class InfraStack extends Stack {
 
         const reminderStack = new ReminderStack(this, 'ReminderStack');
 
-        const frontendStack = new FrontendStack(this, 'TodoFrontendStack');
+        // skip frontend deployment in codebuild for backend ci
+        const skipFrontend = this.node.tryGetContext('skipFrontend');
+        if (skipFrontend !== true && skipFrontend !== 'true') {
+            const frontendStack = new FrontendStack(this, 'TodoFrontendStack');
+        }
     }
 }
