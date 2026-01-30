@@ -3,6 +3,8 @@ import { Construct } from 'constructs';
 import * as codepipeline from 'aws-cdk-lib/aws-codepipeline';
 import * as codepipelineActions from 'aws-cdk-lib/aws-codepipeline-actions';
 import * as codebuild from 'aws-cdk-lib/aws-codebuild';
+import * as events from 'aws-cdk-lib/aws-events';
+import * as targets from 'aws-cdk-lib/aws-events-targets';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { ciConfig } from '../../config/backend/config.ci';
@@ -16,6 +18,8 @@ export class BackendPipelineStack extends cdk.Stack {
             blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
             encryption: s3.BucketEncryption.S3_MANAGED,
             removalPolicy: cdk.RemovalPolicy.RETAIN,
+            // enable event bridge for s3 source action
+            eventBridgeEnabled: true,
         });
 
         const backendSourceObjectKey = ciConfig.backendSourceObjectKey;
@@ -122,7 +126,7 @@ export class BackendPipelineStack extends cdk.Stack {
                     bucket: sourceBucket,
                     bucketKey: backendSourceObjectKey,
                     output: backendSourceOutput,
-                    trigger: codepipelineActions.S3Trigger.EVENTS,
+                    trigger: codepipelineActions.S3Trigger.NONE,
                 }),
                 new codepipelineActions.S3SourceAction({
                     actionName: 'InfraSource',
@@ -130,6 +134,15 @@ export class BackendPipelineStack extends cdk.Stack {
                     bucketKey: infraSourceObjectKey,
                     output: infraSourceOutput,
                     trigger: codepipelineActions.S3Trigger.NONE,
+                }),
+            ],
+        });
+
+        pipeline.addStage({
+            stageName: 'Approve',
+            actions: [
+                new codepipelineActions.ManualApprovalAction({
+                    actionName: 'ApproveDeploy',
                 }),
             ],
         });
@@ -144,6 +157,20 @@ export class BackendPipelineStack extends cdk.Stack {
                     extraInputs: [backendSourceOutput],
                 }),
             ],
+        });
+
+        // trigger pipeline when backend-source.zip is uploaded
+        new events.Rule(this, 'TriggerPipelineOnBackendZip', {
+            description: 'Start CodePipeline when backend-source.zip is uploaded',
+            eventPattern: {
+                source: ['aws.s3'],
+                detailType: ['Object Created'],
+                detail: {
+                    bucket: { name: [sourceBucket.bucketName] },
+                    object: { key: [backendSourceObjectKey] },
+                },
+            },
+            targets: [new targets.CodePipeline(pipeline)],
         });
 
         new cdk.CfnOutput(this, 'BackendSourceBucketName', {
