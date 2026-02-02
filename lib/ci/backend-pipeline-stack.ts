@@ -11,7 +11,10 @@ import { ciConfig } from '../../config/backend/config.ci';
 
 export class BackendPipelineStack extends cdk.Stack {
     constructor(scope: Construct, id: string, props?: cdk.StackProps) {
-        super(scope, id, props);
+        super(scope, id, {
+            ...props,
+            description: "Todo App backend CI"
+        });
 
         const sourceBucket = new s3.Bucket(this, 'BackendSourceBucket', {
             versioned: true,
