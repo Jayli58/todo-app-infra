@@ -42,13 +42,13 @@ export class BaseStack extends cdk.Stack {
 
     // secondary index added for load more functionality
     this.todosTable.addGlobalSecondaryIndex({
-      indexName: 'UserIdStatusTodoId',
+      indexName: 'UserIdActiveTodoId',
       partitionKey: {
         name: 'UserId',
         type: dynamodb.AttributeType.STRING,
       },
       sortKey: {
-        name: 'StatusTodoId',
+        name: 'ActiveTodoId',
         type: dynamodb.AttributeType.STRING,
       },
       projectionType: dynamodb.ProjectionType.INCLUDE,

@@ -74,7 +74,7 @@ export class ApiStack extends cdk.Stack {
 
         apiFn.addToRolePolicy(new iam.PolicyStatement({
             actions: ['dynamodb:Query'],
-            resources: [`${todosTable.tableArn}/index/UserIdStatusTodoId`],
+            resources: [`${todosTable.tableArn}/index/UserIdActiveTodoId`],
         }));
 
         // api gtw
