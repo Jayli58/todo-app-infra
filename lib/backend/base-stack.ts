@@ -55,6 +55,8 @@ export class BaseStack extends cdk.Stack {
       nonKeyAttributes: [
         'Title',
         'Content',
+        'TitleLower',
+        'ContentLower',
         'RemindTimestamp',
         'StatusCode',
       ],
