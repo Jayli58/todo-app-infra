@@ -40,6 +40,26 @@ export class BaseStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.RETAIN,
     });
 
+    // secondary index added for load more functionality
+    this.todosTable.addGlobalSecondaryIndex({
+      indexName: 'UserIdStatusTodoId',
+      partitionKey: {
+        name: 'UserId',
+        type: dynamodb.AttributeType.STRING,
+      },
+      sortKey: {
+        name: 'StatusTodoId',
+        type: dynamodb.AttributeType.STRING,
+      },
+      projectionType: dynamodb.ProjectionType.INCLUDE,
+      nonKeyAttributes: [
+        'Title',
+        'Content',
+        'RemindTimestamp',
+        'StatusCode',
+      ],
+    });
+
     // 2) TodoReminders table + Stream + TTL
     this.todoRemindersTable = new dynamodb.Table(this, 'TodoRemindersTable', {
       tableName: cfg4Reminder.tableName,

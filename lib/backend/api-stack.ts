@@ -72,6 +72,11 @@ export class ApiStack extends cdk.Stack {
             ],
         }));
 
+        apiFn.addToRolePolicy(new iam.PolicyStatement({
+            actions: ['dynamodb:Query'],
+            resources: [`${todosTable.tableArn}/index/UserIdStatusTodoId`],
+        }));
+
         // api gtw
         const issuer = `https://cognito-idp.${cognitoRegion}.amazonaws.com/${userPoolId}`;
 
