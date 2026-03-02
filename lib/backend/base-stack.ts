@@ -149,6 +149,7 @@ export class BaseStack extends cdk.Stack {
       },
       managedLoginVersion: cognito.ManagedLoginVersion.NEWER_MANAGED_LOGIN,
     });
+    domain.applyRemovalPolicy(cdk.RemovalPolicy.RETAIN);
 
     // create app client
     const appClient = userpool.addClient("TodoAppClient", {
@@ -172,12 +173,16 @@ export class BaseStack extends cdk.Stack {
       generateSecret: false,
     });
 
+    // apply removal policy to app client
+    appClient.applyRemovalPolicy(cdk.RemovalPolicy.RETAIN);
+
     // 2) enable login UI
-    new cognito.CfnManagedLoginBranding(this, "TodoAppManagedLoginBranding", {
+    const loginBranding = new cognito.CfnManagedLoginBranding(this, "TodoAppManagedLoginBranding", {
       userPoolId: userpool.userPoolId,
       clientId: appClient.userPoolClientId,
       useCognitoProvidedValues: true,
     });
+    loginBranding.applyRemovalPolicy(cdk.RemovalPolicy.RETAIN);
 
     // store cognito info into ssm
     new ssm.StringParameter(this, "UserPoolIdParam", {

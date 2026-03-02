@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 import * as cdk from 'aws-cdk-lib/core';
-import {InfraStack} from "../lib/index";
-import {FrontendCertStack} from "../lib/frontend/frontend-cert-stack";
-import {BackendPipelineStack} from "../lib/ci/backend-pipeline-stack";
+import { InfraStack } from "../lib/index";
+import { FrontendCertStack } from "../lib/frontend/frontend-cert-stack";
+import { BackendPipelineStack } from "../lib/ci/backend-pipeline-stack";
+import { BaseStackSupplementary } from "../lib/backend/base-stack-supplementary";
 
 const app = new cdk.App();
 
@@ -17,6 +18,14 @@ new FrontendCertStack(app, "TodoFrontendCertStack", {
 new InfraStack(app, 'InfraStack', {
   env: { account: account, region: region },
 });
+
+// Supplementary stack for creating only Cognito app client
+// const enableSupplementary = app.node.tryGetContext('enableSupplementary');
+// if (enableSupplementary === true || enableSupplementary === 'true') {
+//   new BaseStackSupplementary(app, 'BaseStackSupplementary', {
+//     env: { account: account, region: region },
+//   });
+// }
 
 new BackendPipelineStack(app, 'BackendPipelineStack', {
   env: { account: account, region: region },
